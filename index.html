@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classificação LAI — Simulador Interativo | Ministério do Esporte</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            govblue: {
+              50: '#f0f5fc',
+              100: '#dce8f8',
+              200: '#bed5f3',
+              500: '#1351b4',
+              600: '#0c326f',
+              700: '#071d49',
+              800: '#051433',
+              900: '#020b1c'
+            },
+            gogreen: {
+              500: '#168821',
+              600: '#126d1a',
+              700: '#0e5514'
+            },
+            govyellow: {
+              400: '#ffcd07',
+              500: '#e5b300'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-govblue-500 selection:text-white">
+
+  <!-- Cabeçalho -->
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-2">
+        <span class="inline-block w-3.5 h-3.5 rounded-full bg-gogreen-500 shadow-sm shadow-gogreen-500/50"></span>
+        <span class="inline-block w-3.5 h-3.5 rounded-full bg-govyellow-400 shadow-sm shadow-govyellow-400/50"></span>
+        <span class="inline-block w-3.5 h-3.5 rounded-full bg-govblue-500 shadow-sm shadow-govblue-500/50"></span>
+      </div>
+      <div class="h-5 w-px bg-slate-700"></div>
+      <div>
+        <h1 class="text-sm font-semibold tracking-wide text-white uppercase flex items-center gap-2">
+          <span>Ministério do Esporte</span>
+          <span class="text-xs bg-emerald-700/80 text-emerald-200 px-2 py-0.5 rounded font-mono font-medium">LAI — Acesso à Informação</span>
+        </h1>
+        <p class="text-xs text-slate-400">Classificação das Demandas da Lei de Acesso à Informação (LAI)</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 text-xs">
+      <span class="px-2.5 py-1.5 rounded-md bg-emerald-900/50 border border-emerald-700/50 text-emerald-300 flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Classificação LAI</span>
+      </span>
+    </div>
+  </header>
+
+  <!-- Área principal -->
+  <main class="flex-1 w-full max-w-7xl mx-auto p-4 md:p-6">
+
+    <!-- Título -->
+    <div class="border-b border-slate-800 pb-3 mb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <div>
+        <span class="text-xs font-bold text-emerald-400 tracking-wider uppercase flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          Simulador Interativo ao Vivo
+        </span>
+        <h2 class="text-2xl md:text-3xl font-extrabold text-white mt-0.5">Teste a Estrutura LAI na Prática</h2>
+        <p class="text-slate-400 text-xs sm:text-sm mt-0.5">Assunto → Subassunto → Tags globais, independente da árvore da Ouvidoria.</p>
+      </div>
+      <button onclick="resetSimulation()" class="self-start sm:self-auto text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        <span>Limpar Simulação</span>
+      </button>
+    </div>
+
+    <!-- Aviso de pendências -->
+    <div class="mb-4 bg-amber-950/40 border border-amber-600/40 rounded-xl p-3 flex items-start gap-2.5">
+      <span class="text-amber-400 text-base mt-0.5">⚠️</span>
+      <div class="text-xs text-amber-200/90 leading-relaxed">
+        <strong class="text-amber-300">Atenção:</strong> 3 dos 5 assuntos da árvore LAI possuem subassuntos ainda <strong class="text-amber-200">Pendentes</strong> de definição. Eles aparecem identificados como <span class="bg-amber-900/60 text-amber-200 px-1.5 py-0.5 rounded font-mono text-[10px]">Pendente</span> e não devem ser tratados como classificações definitivas. As tags são <strong class="text-amber-200">globais</strong> e independentes do assunto.
+      </div>
+    </div>
+
+    <!-- Grade principal do simulador -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+      <!-- Coluna 1: Assunto -->
+      <div class="lg:col-span-4 bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col h-[560px]">
+        <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-800">
+          <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-govblue-600 text-white flex items-center justify-center text-[10px]">1</span>
+            <span>1. Selecione o Assunto</span>
+          </h3>
+          <span class="text-[10px] text-slate-400 font-mono" id="assuntosCount">5 Assuntos</span>
+        </div>
+        <div class="space-y-1.5 overflow-y-auto pr-1 flex-1" id="assuntosListContainer"><!-- via JS --></div>
+      </div>
+
+      <!-- Coluna 2: Subassunto -->
+      <div class="lg:col-span-4 bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col h-[560px]">
+        <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-800">
+          <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">2</span>
+            <span>2. Subassunto Vinculado</span>
+          </h3>
+          <span class="text-[10px] text-emerald-400 font-mono" id="subassuntosCount">Depende do Assunto</span>
+        </div>
+        <div id="subassuntosListContainer" class="space-y-1.5 overflow-y-auto pr-1 flex-1">
+          <div class="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
+            <svg class="w-10 h-10 mb-2 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
+            <p class="text-xs font-medium text-slate-400">Nenhum Assunto selecionado</p>
+            <p class="text-[11px] text-slate-500 mt-1">Clique em um assunto ao lado para carregar seus subassuntos.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna 3: Tags + Ficha -->
+      <div class="lg:col-span-4 flex flex-col gap-3 h-[560px]">
+
+        <!-- Tags -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex-1 flex flex-col overflow-hidden">
+          <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-800">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-amber-500 text-slate-900 font-bold flex items-center justify-center text-[10px]">3</span>
+              <span>TAGS Globais</span>
+            </h3>
+            <span class="text-[10px] text-amber-400 font-mono">Independentes do assunto</span>
+          </div>
+
+          <div id="recommendedTagsSection" class="mb-2 p-2 rounded-xl bg-gradient-to-r from-amber-950/40 to-slate-900 border border-amber-500/30 transition">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-bold text-amber-300 flex items-center gap-1">
+                <span>⭐</span>
+                <span>Tags sugeridas para este contexto:</span>
+              </span>
+              <button onclick="applyAllRecommendedTags()" id="applyAllRecBtn" class="text-[9px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 px-1.5 py-0.5 rounded border border-amber-500/40 font-mono transition disabled:opacity-40" disabled>
+                ⚡ Marcar Todas
+              </button>
+            </div>
+            <div id="recommendedTagsList" class="flex flex-wrap gap-1 max-h-16 overflow-y-auto pr-0.5">
+              <span class="text-[10px] text-slate-500 italic">Selecione um subassunto para ver sugestões.</span>
+            </div>
+          </div>
+
+          <div class="text-[10px] text-slate-400 font-medium mb-1">Catálogo Global por Categoria:</div>
+          <div id="tagCategoryContainer" class="flex items-center gap-1.5 overflow-x-auto pb-1.5 mb-2 no-scrollbar text-[10px]"><!-- via JS --></div>
+          <div id="tagsCloudContainer" class="flex flex-wrap gap-1.5 overflow-y-auto pr-1 flex-1 content-start"><!-- via JS --></div>
+        </div>
+
+        <!-- Ficha LAI -->
+        <div class="bg-gradient-to-br from-slate-900 to-emerald-950/70 border-2 border-emerald-500/40 rounded-xl p-3 shadow-md">
+          <div class="flex items-center justify-between text-[10px] uppercase font-mono text-emerald-300 font-bold mb-1">
+            <span>Ficha LAI Montada</span>
+            <span class="bg-emerald-600/30 text-emerald-200 px-1.5 py-0.5 rounded border border-emerald-500/30">Classificação</span>
+          </div>
+          <div class="space-y-0.5 text-xs">
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-slate-400 font-medium text-[10px]">Assunto:</span>
+              <span class="text-white font-bold text-[11px]" id="previewAssunto">Nenhum</span>
+            </div>
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-slate-400 font-medium text-[10px]">Subassunto:</span>
+              <span class="text-emerald-300 font-bold text-[11px]" id="previewSubassunto">Nenhum</span>
+            </div>
+            <div class="flex flex-col gap-0.5 pt-1 border-t border-slate-800">
+              <span class="text-slate-400 text-[9px]">TAGS Marcadas:</span>
+              <div id="previewTagsList" class="flex flex-wrap gap-1 text-[10px] text-amber-200">
+                <span class="text-slate-500 italic">Nenhuma tag marcada</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Nota sobre tags globais e associações -->
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-slate-900/70 border border-slate-800 rounded-xl p-4">
+        <h4 class="text-xs font-bold text-blue-300 uppercase tracking-wider mb-2">ℹ️ Tags globais</h4>
+        <p class="text-[11px] text-slate-300 leading-relaxed">
+          As tags são <strong class="text-white">globais e independentes do assunto</strong>: uma mesma tag pode ser usada em diferentes assuntos/subassuntos quando aplicável. Elas são organizadas em um catálogo global (Áreas) e associadas à árvore conforme as relações estabelecidas com segurança. Associações incertas são sinalizadas como <span class="text-amber-300">pendentes de validação</span>.
+        </p>
+      </div>
+      <div class="bg-slate-900/70 border border-slate-800 rounded-xl p-4">
+        <h4 class="text-xs font-bold text-emerald-300 uppercase tracking-wider mb-2">🧭 Hierarquia</h4>
+        <p class="text-[11px] text-slate-300 leading-relaxed">
+          O filtro respeita a hierarquia <strong class="text-white">Assunto → Subassunto</strong>, sem impedir que as tags globais sejam usadas nos diferentes contextos. <strong class="text-white">Assunto</strong> é a categoria principal da demanda; <strong class="text-white">Subassunto</strong> é a classificação subordinada; <strong class="text-white">Tag</strong> é o marcador global aplicável.
+        </p>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="bg-slate-900/90 backdrop-blur border-t border-slate-800 px-6 py-3 text-center">
+    <p class="text-xs text-slate-500">Classificação LAI — Ministério do Esporte • Página independente da árvore da Ouvidoria</p>
+  </footer>
+
+  <script>
+    // =============================================================
+    // Árvore de Classificação LAI
+    // =============================================================
+    const classificationTree = [
+      {
+        id: 'esporte',
+        nome: 'Esporte',
+        categoria: 'finalistico',
+        status: 'definido',
+        subassuntos: [
+          'Bolsa Atleta',
+          'Confederação',
+          'Bolsa Pódio',
+          'Lei de Incentivo ao Esporte',
+          'Paradesporto',
+          'Projeto',
+          'Direitos do Torcedor',
+          'Pesquisas',
+          'Quotas Fixas',
+          'Política Nacional de Antidopagem',
+          'Copa do Mundo Feminino 2027',
+          'Apostas Esportivas',
+          'Plataformas de Jogos',
+          'Revelar Talentos',
+          'Programa Excelência Para a Vida',
+          'Promoção e Apoio ao desenvolvimento do Futebol'
+        ]
+      },
+      {
+        id: 'esporte_seguro',
+        nome: 'Esporte Seguro',
+        categoria: 'seguro',
+        status: 'pendente',
+        subassuntos: ['Pendente']
+      },
+      {
+        id: 'tecnologia_informacao',
+        nome: 'Tecnologia de Informacao de Sistemas',
+        categoria: 'ti',
+        status: 'pendente',
+        subassuntos: ['Pendente']
+      },
+      {
+        id: 'informacao_processuais',
+        nome: 'Informacao de Processuais',
+        categoria: 'documentos',
+        status: 'pendente',
+        subassuntos: ['Pendente']
+      },
+      {
+        id: 'acesso_informacao',
+        nome: 'ACESSO À INFORMAÇÃO',
+        categoria: 'acesso',
+        status: 'definido',
+        subassuntos: [
+          'Comissão Permanente de Regulamentação e Monitoramento',
+          'Programa Esporte e Lazer da Cidade',
+          'Programa Segundo Tempo (PST Padrão)',
+          'Programa Segundo Tempo (PST Universitário)',
+          'Programa Vida Saudável',
+          'Programa Skate por Lazer',
+          'Programa Semear',
+          'Programa Teativo',
+          'Paradesporto Rede',
+          'Programa maré',
+          'Projeto Vivências',
+          'Educação Paradesporto',
+          'Certificação 1818A',
+          'Infraestrutura Esportiva',
+          'Cópia de Processo'
+        ]
+      }
+    ];
+
+    // =============================================================
+    // Catálogo Global de Tags (independente do assunto)
+    // =============================================================
+    const tagCategories = [
+      { id: 'todas', label: 'Todas as Tags' },
+      { id: 'areas', label: 'Áreas' }
+    ];
+
+    const globalTags = [
+      // Áreas
+      { nome: 'SE', tipo: 'areas' },
+      { nome: 'SNE', tipo: 'areas' },
+      { nome: 'SNEAELIS', tipo: 'areas' },
+      { nome: 'SNEAEDE', tipo: 'areas' },
+      { nome: 'SNPAR', tipo: 'areas' },
+      { nome: 'SNFDT', tipo: 'areas' },
+      { nome: 'OUVIDORIA', tipo: 'areas' },
+      { nome: 'ABCD', tipo: 'areas' },
+      { nome: 'DPPIE', tipo: 'areas' },
+      { nome: 'DPROJ', tipo: 'areas' },
+      { nome: 'DCERT', tipo: 'areas' },
+      { nome: 'DIE', tipo: 'areas' },
+      { nome: 'SECOPA', tipo: 'areas' },
+      { nome: 'MESP', tipo: 'areas' },
+      { nome: 'MODALIDADES ESPORTIVAS', tipo: 'areas' }
+    ];
+
+    // =============================================================
+    // Associações tag ↔ classificação (sugestões por contexto)
+    // =============================================================
+    const recommendedTagsMap = {
+      'esporte_Bolsa Atleta': ['SNE'],
+      'esporte_Confederação': ['MODALIDADES ESPORTIVAS'],
+      'esporte_Bolsa Pódio': ['SNE'],
+      'esporte_Lei de Incentivo ao Esporte': ['DPPIE'],
+      'esporte_Paradesporto': ['SNPAR'],
+      'esporte_Projeto': ['DPROJ'],
+      'esporte_Direitos do Torcedor': ['SNFDT'],
+      'esporte_Quotas Fixas': ['SNEAEDE'],
+      'esporte_Política Nacional de Antidopagem': ['ABCD'],
+      'esporte_Copa do Mundo Feminino 2027': ['SECOPA'],
+      'acesso_informacao_Comissão Permanente de Regulamentação e Monitoramento': ['SNEAEDE'],
+      'acesso_informacao_Cópia de Processo': ['OUVIDORIA']
+    };
+
+    // Associações que ainda precisam de validação (incerteza de contexto)
+    const pendingAssociations = new Set([
+      'esporte_Confederação',
+      'esporte_Quotas Fixas'
+    ]);
+
+    // =============================================================
+    // Estado e renderização
+    // =============================================================
+    let selectedAssuntoId = null;
+    let selectedSubassunto = null;
+    let selectedTags = new Set();
+    let currentTagFilter = 'todas';
+
+    function renderAssuntosList() {
+      const container = document.getElementById('assuntosListContainer');
+      container.innerHTML = '';
+      classificationTree.forEach(assunto => {
+        const isSelected = assunto.id === selectedAssuntoId;
+        const isPendente = assunto.status === 'pendente';
+        const btn = document.createElement('button');
+        btn.onclick = () => selectAssunto(assunto.id);
+        btn.className = 'w-full text-left p-2.5 rounded-xl border transition flex items-center justify-between group ' +
+          (isSelected
+            ? 'bg-govblue-600 border-blue-400 text-white shadow-md shadow-govblue-900/50 font-semibold'
+            : 'bg-slate-800/60 border-slate-700/60 text-slate-300 hover:bg-slate-800 hover:text-white hover:border-slate-600');
+
+        let iconBadge = '📁';
+        if (assunto.categoria === 'seguro') iconBadge = '🛡️';
+        if (assunto.categoria === 'ti') iconBadge = '💻';
+        if (assunto.categoria === 'documentos') iconBadge = '📄';
+        if (assunto.categoria === 'acesso') iconBadge = '🔎';
+        if (assunto.categoria === 'finalistico') iconBadge = '🏅';
+
+        let badge;
+        if (isPendente) {
+          badge = '<span class="text-[9px] bg-amber-900/70 text-amber-300 px-1.5 py-0.5 rounded font-mono">Pendente</span>';
+        } else {
+          badge = '<span class="text-[10px] px-1.5 py-0.5 rounded font-mono ' +
+            (isSelected ? 'bg-blue-800 text-blue-200' : 'bg-slate-700/80 text-slate-400 group-hover:text-slate-200') +
+            '">' + assunto.subassuntos.length + '</span>';
+        }
+
+        btn.innerHTML =
+          '<div class="flex items-center gap-2 truncate">' +
+          '<span class="text-sm">' + iconBadge + '</span>' +
+          '<span class="text-xs truncate">' + assunto.nome + '</span>' +
+          '</div>' + badge;
+        container.appendChild(btn);
+      });
+    }
+
+    function selectAssunto(id) {
+      if (selectedAssuntoId === id && selectedSubassunto !== null) return;
+      selectedAssuntoId = id;
+      selectedSubassunto = null;
+      renderAssuntosList();
+      renderSubassuntosList();
+      renderRecommendedTags();
+      updatePreview();
+    }
+
+    function renderSubassuntosList() {
+      const container = document.getElementById('subassuntosListContainer');
+      const counter = document.getElementById('subassuntosCount');
+      const assunto = classificationTree.find(a => a.id === selectedAssuntoId);
+      if (!assunto) {
+        counter.innerText = 'Depende do Assunto';
+        container.innerHTML = '<div class="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">' +
+          '<p class="text-xs font-medium text-slate-400">Nenhum Assunto selecionado</p>' +
+          '<p class="text-[11px] text-slate-500 mt-1">Selecione um assunto na coluna 1.</p></div>';
+        return;
+      }
+      const isPendente = assunto.status === 'pendente';
+      counter.innerText = isPendente ? 'Pendente' : (assunto.subassuntos.length + ' disponíveis');
+      container.innerHTML = '';
+      assunto.subassuntos.forEach(sub => {
+        const isSelected = sub === selectedSubassunto;
+        const btn = document.createElement('button');
+        btn.onclick = () => selectSubassunto(sub);
+        if (isPendente) {
+          btn.className = 'w-full text-left p-2.5 rounded-xl border border-dashed border-amber-600/50 bg-amber-950/30 text-amber-300 flex items-center gap-2 cursor-not-allowed';
+          btn.innerHTML = '<span class="text-xs">⚠️</span><span class="text-xs">' + sub + ' — a definir</span>';
+          btn.disabled = true;
+        } else {
+          btn.className = 'w-full text-left p-2.5 rounded-xl border transition flex items-center justify-between group ' +
+            (isSelected
+              ? 'bg-emerald-600 border-emerald-400 text-white shadow-md shadow-emerald-950/50 font-semibold'
+              : 'bg-slate-800/60 border-slate-700/60 text-slate-300 hover:bg-slate-800 hover:text-white hover:border-slate-600');
+          btn.innerHTML =
+            '<div class="flex items-center gap-2 truncate">' +
+            '<span class="text-xs ' + (isSelected ? 'text-emerald-200' : 'text-emerald-400') + '">↳</span>' +
+            '<span class="text-xs truncate">' + sub + '</span></div>' +
+            (isSelected ? '<span class="text-[10px] bg-emerald-800 text-emerald-100 px-1.5 py-0.5 rounded font-mono">Selecionado</span>' : '');
+        }
+        container.appendChild(btn);
+      });
+    }
+
+    function selectSubassunto(nome) {
+      selectedSubassunto = nome;
+      renderSubassuntosList();
+      renderRecommendedTags();
+      updatePreview();
+    }
+
+    function renderRecommendedTags() {
+      const container = document.getElementById('recommendedTagsList');
+      const applyBtn = document.getElementById('applyAllRecBtn');
+      if (!container) return;
+      container.innerHTML = '';
+      if (!selectedAssuntoId || !selectedSubassunto) {
+        container.innerHTML = '<span class="text-[10px] text-slate-500 italic">Selecione um subassunto para ver sugestões.</span>';
+        if (applyBtn) applyBtn.disabled = true;
+        return;
+      }
+      const key = selectedAssuntoId + '_' + selectedSubassunto;
+      const recs = recommendedTagsMap[key] || [];
+      if (recs.length === 0) {
+        container.innerHTML = '<span class="text-[10px] text-slate-400 italic">Sem associação confirmada — pendente de validação.</span>';
+        if (applyBtn) applyBtn.disabled = true;
+        return;
+      }
+      if (applyBtn) applyBtn.disabled = false;
+      if (pendingAssociations.has(key)) {
+        const note = document.createElement('span');
+        note.className = 'w-full text-[9px] text-amber-400 italic mb-1';
+        note.innerText = '⚠️ Associação pendente de validação:';
+        container.appendChild(note);
+      }
+      recs.forEach(tagName => {
+        const isSelected = selectedTags.has(tagName);
+        const chip = document.createElement('button');
+        chip.onclick = () => toggleTag(tagName);
+        chip.className = 'px-2 py-0.5 rounded-lg text-[10px] transition border flex items-center gap-1 ' +
+          (isSelected
+            ? 'bg-amber-500 text-slate-950 font-bold border-amber-300 shadow-sm'
+            : 'bg-amber-950/70 text-amber-200 hover:bg-amber-900 border-amber-700/60');
+        chip.innerHTML = '<span>' + (isSelected ? '✓' : '★') + '</span><span>' + tagName + '</span>';
+        container.appendChild(chip);
+      });
+    }
+
+    function applyAllRecommendedTags() {
+      if (!selectedAssuntoId || !selectedSubassunto) return;
+      const key = selectedAssuntoId + '_' + selectedSubassunto;
+      const recs = recommendedTagsMap[key] || [];
+      recs.forEach(tag => selectedTags.add(tag));
+      renderRecommendedTags();
+      renderTagsCloud();
+      updatePreview();
+    }
+
+    function filterTagCategory(cat) {
+      currentTagFilter = cat;
+      renderTagCategoryButtons();
+      renderTagsCloud();
+    }
+
+    function renderTagCategoryButtons() {
+      const container = document.getElementById('tagCategoryContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      tagCategories.forEach(cat => {
+        const count = cat.id === 'todas'
+          ? globalTags.length
+          : globalTags.filter(t => t.tipo === cat.id).length;
+        const isSelected = cat.id === currentTagFilter;
+        const btn = document.createElement('button');
+        btn.onclick = () => filterTagCategory(cat.id);
+        btn.className = 'tag-cat-btn whitespace-nowrap px-2.5 py-1 rounded-lg transition font-medium text-[10px] flex items-center gap-1.5 ' +
+          (isSelected
+            ? 'bg-amber-500 text-slate-950 font-bold shadow-sm shadow-amber-500/20'
+            : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700');
+        btn.innerHTML = '<span>' + cat.label + '</span>' +
+          '<span class="text-[9px] px-1 py-0.5 rounded font-mono ' +
+          (isSelected ? 'bg-amber-600/40 text-slate-950' : 'bg-slate-700 text-slate-400') + '">' + count + '</span>';
+        container.appendChild(btn);
+      });
+    }
+
+    function renderTagsCloud() {
+      const container = document.getElementById('tagsCloudContainer');
+      container.innerHTML = '';
+      const tags = globalTags.filter(t => currentTagFilter === 'todas' || t.tipo === currentTagFilter);
+      tags.forEach(tag => {
+        const isSelected = selectedTags.has(tag.nome);
+        const btn = document.createElement('button');
+        btn.onclick = () => toggleTag(tag.nome);
+        let colorClasses = isSelected
+          ? 'bg-amber-500 text-slate-950 font-bold border-amber-300 shadow-sm'
+          : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border-slate-700';
+        btn.className = 'px-2 py-1 rounded-lg text-[11px] border transition flex items-center gap-1 ' + colorClasses;
+        btn.innerHTML = '<span>' + (isSelected ? '✓ ' : '+ ') + '</span><span>' + tag.nome + '</span>';
+        container.appendChild(btn);
+      });
+    }
+
+    function toggleTag(nome) {
+      if (selectedTags.has(nome)) selectedTags.delete(nome);
+      else selectedTags.add(nome);
+      renderRecommendedTags();
+      renderTagsCloud();
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const assunto = classificationTree.find(a => a.id === selectedAssuntoId);
+      document.getElementById('previewAssunto').innerText = assunto ? assunto.nome : '— (Nenhum selecionado)';
+      document.getElementById('previewSubassunto').innerText = selectedSubassunto ? selectedSubassunto : '— (Aguardando seleção)';
+      const tagsContainer = document.getElementById('previewTagsList');
+      if (selectedTags.size === 0) {
+        tagsContainer.innerHTML = '<span class="text-slate-500 italic">Nenhuma tag marcada (opcional)</span>';
+      } else {
+        tagsContainer.innerHTML = '';
+        selectedTags.forEach(tag => {
+          const badge = document.createElement('span');
+          badge.className = 'bg-amber-950/80 text-amber-300 border border-amber-700/60 px-1.5 py-0.5 rounded text-[10px] font-mono';
+          badge.innerText = '#' + tag;
+          tagsContainer.appendChild(badge);
+        });
+      }
+    }
+
+    function resetSimulation() {
+      selectedAssuntoId = null;
+      selectedSubassunto = null;
+      selectedTags.clear();
+      currentTagFilter = 'todas';
+      renderAssuntosList();
+      renderSubassuntosList();
+      renderRecommendedTags();
+      renderTagCategoryButtons();
+      renderTagsCloud();
+      updatePreview();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAssuntosList();
+      renderSubassuntosList();
+      renderRecommendedTags();
+      renderTagCategoryButtons();
+      renderTagsCloud();
+      updatePreview();
+    });
+  </script>
+</body>
+</html>
